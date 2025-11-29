@@ -10,9 +10,21 @@ kotlin {
 }
 
 intellijPlatform {
+    buildSearchableOptions = false
     pluginConfiguration {
+        id = "day.vitayuzu.tabout"
         name = "Tabout"
         version = "2.0"
+        vendor {
+            name = "Yuzu Vita"
+            email = "github@vitayuzu.day"
+            url = "https://github.com/heddxh/tabout"
+        }
+    }
+    pluginVerification {
+        ides {
+            recommended()
+        }
     }
 }
 
@@ -25,6 +37,6 @@ repositories {
 
 dependencies {
     intellijPlatform {
-        create("IC", "2025.2.4")
+        intellijIdea("2025.2.4")
     }
 }

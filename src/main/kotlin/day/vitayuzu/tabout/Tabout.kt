@@ -1,4 +1,4 @@
-package org.kratosgado.tabout
+package day.vitayuzu.tabout
 
 import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.openapi.actionSystem.AnAction
