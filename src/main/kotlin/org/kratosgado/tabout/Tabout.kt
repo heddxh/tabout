@@ -34,7 +34,7 @@ class Tabout : AnAction() {
                     }
                 }
 
-                e.inputEvent.isShiftDown && shouldTabIn(document, offset) -> {
+                e.inputEvent?.isShiftDown == true && shouldTabIn(document, offset) -> {
 //                    println("Tabin")
                     caret.moveToOffset(offset.value)
                 }
