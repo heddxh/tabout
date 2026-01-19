@@ -14,7 +14,7 @@ intellijPlatform {
     pluginConfiguration {
         id = "day.vitayuzu.tabout"
         name = "Tabout"
-        version = "2.0"
+        version = "2.0.1"
         vendor {
             name = "Yuzu Vita"
             email = "github@vitayuzu.day"

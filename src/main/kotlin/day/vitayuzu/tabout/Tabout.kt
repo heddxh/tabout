@@ -1,6 +1,5 @@
 package day.vitayuzu.tabout
 
-import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -8,56 +7,52 @@ import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
-import org.apache.commons.lang3.mutable.MutableInt
 
 class Tabout : AnAction() {
     private val targets = charArrayOf(')', '}', ']', '(', '[', '{', '"', '\'', '<', '>')
 
     override fun actionPerformed(e: AnActionEvent) {
-//        println("Tab triggered")
-        val editor = e.getData(CommonDataKeys.EDITOR)
-        if (editor != null) {
-            val caret = editor.caretModel.currentCaret
-            val document = editor.document
-            val offset = MutableInt(caret.offset)
+        val editor = e.getData(CommonDataKeys.EDITOR) ?: return
+        val caret = editor.caretModel.currentCaret
+        val document = editor.document
+        val currentOffset = caret.offset
 
-            when {
-                e.inputEvent?.isShiftDown == true && shouldTabIn(document, offset) -> {
-//                    println("Tabin")
-                    caret.moveToOffset(offset.value)
-                }
+        val targetOffset =
+            if (e.inputEvent?.isShiftDown == true) {
+                findTabInOffset(document, currentOffset)
+            } else {
+                findTaboutOffset(document, currentOffset)
+            }
 
-                offset.value < document.textLength && shouldTabout(document, offset) -> {
-//                    println("Tabout")
-                    caret.moveToOffset(offset.value)
-                }
-
-                else -> {
-//                    println("Passing on")
-                    val actionHandler =
-                        EditorActionManager.getInstance()
-                            .getActionHandler(IdeActions.ACTION_EDITOR_TAB)
-                    WriteCommandAction.runWriteCommandAction(editor.project) {
-                        actionHandler.execute(editor, caret, e.dataContext)
-                    }
-                }
+        if (targetOffset != null) {
+            caret.moveToOffset(targetOffset)
+        } else {
+            val actionHandler = EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_TAB)
+            WriteCommandAction.runWriteCommandAction(editor.project) {
+                actionHandler.execute(editor, caret, e.dataContext)
             }
         }
     }
 
-    private fun shouldTabout(document: Document, offset: MutableInt): Boolean {
-        val endOffset = document.getLineEndOffset(document.getLineNumber(offset.value))
-        while (offset.value < endOffset) {
-            if (targets.contains(document.charsSequence[offset.andIncrement])) return true
+    private fun findTaboutOffset(document: Document, offset: Int): Int? {
+        val lineNumber = document.getLineNumber(offset)
+        val endOffset = document.getLineEndOffset(lineNumber)
+        for (i in offset until endOffset) {
+            if (targets.contains(document.charsSequence[i])) {
+                return i + 1
+            }
         }
-        return false
+        return null
     }
 
-    private fun shouldTabIn(document: Document, offset: MutableInt): Boolean {
-        val startOffset = document.getLineStartOffset(document.getLineNumber(offset.value))
-        while (offset.value > startOffset) {
-            if (targets.contains(document.charsSequence[offset.decrementAndGet()])) return true
+    private fun findTabInOffset(document: Document, offset: Int): Int? {
+        val lineNumber = document.getLineNumber(offset)
+        val startOffset = document.getLineStartOffset(lineNumber)
+        for (i in offset - 1 downTo startOffset) {
+            if (targets.contains(document.charsSequence[i])) {
+                return i
+            }
         }
-        return false
+        return null
     }
 }
