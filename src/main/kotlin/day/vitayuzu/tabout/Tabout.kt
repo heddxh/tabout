@@ -17,23 +17,11 @@ class Tabout : AnAction() {
 //        println("Tab triggered")
         val editor = e.getData(CommonDataKeys.EDITOR)
         if (editor != null) {
-            val isPopupOpened = LookupManager.getActiveLookup(editor) != null
-
             val caret = editor.caretModel.currentCaret
             val document = editor.document
             val offset = MutableInt(caret.offset)
 
             when {
-                isPopupOpened -> {
-//                    println("completion popup is opened")
-                    val actionHandler =
-                        EditorActionManager.getInstance()
-                            .getActionHandler(IdeActions.ACTION_EDITOR_TAB)
-                    WriteCommandAction.runWriteCommandAction(editor.project) {
-                        actionHandler.execute(editor, caret, e.dataContext)
-                    }
-                }
-
                 e.inputEvent?.isShiftDown == true && shouldTabIn(document, offset) -> {
 //                    println("Tabin")
                     caret.moveToOffset(offset.value)
